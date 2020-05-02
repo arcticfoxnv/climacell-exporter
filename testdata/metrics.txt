@@ -1,0 +1,3 @@
+# HELP sample_metric A gauge metric representing something.
+# TYPE sample_metric gauge
+sample_metric{name="foo"} 0.123
