@@ -13,14 +13,14 @@ func loadConfig() (*viper.Viper, error) {
 	v := viper.New()
 
 	// Configure viper
-	v.SetConfigName("example")
+	v.SetConfigName("climacell")
 	v.SetConfigType("toml")
 	v.AddConfigPath("/etc")
 	v.AddConfigPath(".")
-	v.SetEnvPrefix("example")
+	v.SetEnvPrefix("climacell")
 	v.AutomaticEnv()
 
-	if path, present := os.LookupEnv("EXAMPLE_CONFIG_FILE"); present {
+	if path, present := os.LookupEnv("CLIMACELL_CONFIG_FILE"); present {
 		v.SetConfigFile(path)
 	}
 

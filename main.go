@@ -10,6 +10,7 @@ import (
 
 func main() {
 	log.Printf("%s v%s-%s\n", AppName, Version, Commit)
+	log.Println("Powered by ClimaCell - https://www.climacell.co/weather-api")
 
 	// Load config and run preflight
 	config, err := loadConfig()
