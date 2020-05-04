@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/arcticfoxnv/climacell-exporter/climacell"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func main() {
@@ -22,14 +24,29 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	lat, long, err := LookupCityCoords(config.GetString(CFG_CITY))
+	if err != nil {
+		log.Fatalln("Failed to lookup city:", err)
+	}
+
 	// Initialize client (if any)
+	client := climacell.NewClient(
+		config.GetString(CFG_API_KEY),
+		config.GetDuration(CFG_CACHE_TTL),
+	)
+	client.SetUserAgent(fmt.Sprintf("climacell-exporter/%s (https://github.com/arcticfoxnv/climacell-exporter)", Version))
 
 	// Initialize collector
 	collectorOptions := CollectorOptions{
+		City:         config.GetString(CFG_CITY),
+		Latitude:          lat,
+		LocationName: strings.ToLower(config.GetString(CFG_LOCATION_NAME)),
+		Longitude:         long,
+		EnableWeatherDataLayer: true,
 	}
 
 	registry := prometheus.NewRegistry()
-	registry.MustRegister(NewCollector(collectorOptions))
+	registry.MustRegister(NewCollector(client, collectorOptions))
 
 	m := http.NewServeMux()
 	m.Handle("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))

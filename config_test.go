@@ -12,6 +12,33 @@ func TestPreflightCheckOK(t *testing.T) {
 	assert.Nil(t, preflightCheck(cfg))
 }
 
+func TestPrelightCheckErrApiKey(t *testing.T) {
+	cfg, _ := loadConfig()
+	cfg.Set(CFG_API_KEY, "")
+
+	err := preflightCheck(cfg)
+	assert.NotNil(t, err)
+	assert.Equal(t, err, ErrApiKeyMissing)
+}
+
+func TestPrelightCheckErrCity(t *testing.T) {
+	cfg, _ := loadConfig()
+	cfg.Set(CFG_CITY, "")
+
+	err := preflightCheck(cfg)
+	assert.NotNil(t, err)
+	assert.Equal(t, err, ErrCityMissing)
+}
+
+func TestPrelightCheckErrLocationName(t *testing.T) {
+	cfg, _ := loadConfig()
+	cfg.Set(CFG_LOCATION_NAME, "")
+
+	err := preflightCheck(cfg)
+	assert.NotNil(t, err)
+	assert.Equal(t, err, ErrLocationNameMissing)
+}
+
 func TestLoadConfig(t *testing.T) {
 	_, err := loadConfig()
 
