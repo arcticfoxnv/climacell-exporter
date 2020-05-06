@@ -73,6 +73,7 @@ var (
 	}, collectorLabels)
 	tempGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "climacell",
+		Subsystem: "weather",
 		Name:      "temp",
 		Help:      "Temperature",
 	}, collectorLabels)
