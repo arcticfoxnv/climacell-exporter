@@ -38,11 +38,12 @@ func main() {
 
 	// Initialize collector
 	collectorOptions := CollectorOptions{
-		City:         config.GetString(CFG_CITY),
-		Latitude:          lat,
-		LocationName: strings.ToLower(config.GetString(CFG_LOCATION_NAME)),
-		Longitude:         long,
-		EnableWeatherDataLayer: true,
+		City:                      config.GetString(CFG_CITY),
+		Latitude:                  lat,
+		LocationName:              strings.ToLower(config.GetString(CFG_LOCATION_NAME)),
+		Longitude:                 long,
+		EnableWeatherDataLayer:    true,
+		EnableAirQualityDataLayer: true,
 	}
 
 	registry := prometheus.NewRegistry()

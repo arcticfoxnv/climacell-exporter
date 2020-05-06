@@ -16,6 +16,7 @@ var collectorLabels = []string{
 }
 
 var (
+	// Weather data layer
 	baroPressureGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "climacell",
 		Subsystem: "weather",
@@ -99,6 +100,56 @@ var (
 		Name:      "wind_speed",
 		Help:      "Wind speed",
 	}, collectorLabels)
+
+	// Air quality data layer
+	chinaAqiGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "china_aqi",
+		Help:      "Air quality index per China MEP standard",
+	}, collectorLabels)
+	epaAqiGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "epa_aqi",
+		Help:      "Air quality index per US EPA standard",
+	}, collectorLabels)
+	coGauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "co",
+		Help:      "Carbon Monoxide",
+	}, collectorLabels)
+	no2Gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "no2",
+		Help:      "Nitrogen Dioxide",
+	}, collectorLabels)
+	o3Gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "o3",
+		Help:      "Ozone",
+	}, collectorLabels)
+	pm10Gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "pm10",
+		Help:      "Particulate Matter < 10 μm",
+	}, collectorLabels)
+	pm25Gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "pm25",
+		Help:      "Particulate Matter < 2.5 μm",
+	}, collectorLabels)
+	so2Gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "climacell",
+		Subsystem: "aq",
+		Name:      "so2",
+		Help:      "Sulfur Dioxide",
+	}, collectorLabels)
 )
 
 type CollectorOptions struct {
@@ -107,7 +158,8 @@ type CollectorOptions struct {
 	LocationName string
 	Longitude    float64
 
-	EnableWeatherDataLayer bool
+	EnableWeatherDataLayer    bool
+	EnableAirQualityDataLayer bool
 }
 
 type Collector struct {
@@ -141,6 +193,17 @@ func (c *Collector) Describe(ch chan<- *prometheus.Desc) {
 		windGustGauge.Describe(ch)
 		windSpeedGauge.Describe(ch)
 	}
+
+	if c.Options.EnableAirQualityDataLayer {
+		chinaAqiGauge.Describe(ch)
+		epaAqiGauge.Describe(ch)
+		coGauge.Describe(ch)
+		no2Gauge.Describe(ch)
+		o3Gauge.Describe(ch)
+		pm10Gauge.Describe(ch)
+		pm25Gauge.Describe(ch)
+		so2Gauge.Describe(ch)
+	}
 }
 
 func (c *Collector) Collect(ch chan<- prometheus.Metric) {
@@ -151,7 +214,7 @@ func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 	req := &api.RealtimeRequest{
 		Latitude:  c.Options.Latitude,
 		Longitude: c.Options.Longitude,
-		Fields: api.DataFieldList{},
+		Fields:    api.DataFieldList{},
 	}
 
 	if c.Options.EnableWeatherDataLayer {
@@ -171,6 +234,20 @@ func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 			api.WindDirection,
 			api.WindGust,
 			api.WindSpeed,
+		)
+	}
+
+	if c.Options.EnableAirQualityDataLayer {
+		req.Fields = append(
+			req.Fields,
+			api.ChinaAqi,
+			api.EpaAqi,
+			api.CO,
+			api.NO2,
+			api.O3,
+			api.PM10,
+			api.PM25,
+			api.SO2,
 		)
 	}
 
@@ -202,6 +279,15 @@ func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 	c.setIfPresent(windGustGauge, labels, data.WindGust)
 	c.setIfPresent(windSpeedGauge, labels, data.WindSpeed)
 
+	c.setIfPresent(chinaAqiGauge, labels, data.ChinaAqi)
+	c.setIfPresent(epaAqiGauge, labels, data.EpaAqi)
+	c.setIfPresent(coGauge, labels, data.CO)
+	c.setIfPresent(no2Gauge, labels, data.NO2)
+	c.setIfPresent(o3Gauge, labels, data.O3)
+	c.setIfPresent(pm10Gauge, labels, data.PM10)
+	c.setIfPresent(pm25Gauge, labels, data.PM25)
+	c.setIfPresent(so2Gauge, labels, data.SO2)
+
 	// Collect metrics
 	c.collectIfPresent(ch, baroPressureGauge, data.BaroPressure)
 	c.collectIfPresent(ch, cloudBaseGauge, data.CloudBase)
@@ -217,6 +303,16 @@ func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 	c.collectIfPresent(ch, windDirectionGauge, data.WindDirection)
 	c.collectIfPresent(ch, windGustGauge, data.WindGust)
 	c.collectIfPresent(ch, windSpeedGauge, data.WindSpeed)
+
+	c.collectIfPresent(ch, chinaAqiGauge, data.ChinaAqi)
+	c.collectIfPresent(ch, epaAqiGauge, data.EpaAqi)
+	c.collectIfPresent(ch, coGauge, data.CO)
+	c.collectIfPresent(ch, no2Gauge, data.NO2)
+	c.collectIfPresent(ch, o3Gauge, data.O3)
+	c.collectIfPresent(ch, pm10Gauge, data.PM10)
+	c.collectIfPresent(ch, pm25Gauge, data.PM25)
+	c.collectIfPresent(ch, so2Gauge, data.SO2)
+
 }
 
 func (c *Collector) setIfPresent(gauge *prometheus.GaugeVec, labels prometheus.Labels, data api.DataPoint) {

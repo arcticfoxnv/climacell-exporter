@@ -27,11 +27,12 @@ func TestCollector(t *testing.T) {
 
 	client := climacell.NewClient("abc123", time.Minute, climacell.SetHTTPClient(s.Client()))
 	c := NewCollector(client, CollectorOptions{
-		City:         "New York, NY",
-		Latitude:          40.7128,
-		LocationName: "test",
-		Longitude:         -74.0059,
-		EnableWeatherDataLayer: true,
+		City:                      "New York, NY",
+		Latitude:                  40.7128,
+		LocationName:              "test",
+		Longitude:                 -74.0059,
+		EnableWeatherDataLayer:    true,
+		EnableAirQualityDataLayer: true,
 	})
 
 	// Test collector and check for errors
