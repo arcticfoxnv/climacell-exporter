@@ -1,0 +1,4 @@
+# An climacell config file
+api_key = "abc123"
+city = "New York, NY"
+location_name = "Test Location"

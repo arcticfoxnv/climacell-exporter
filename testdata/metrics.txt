@@ -1,3 +1,9 @@
-# HELP sample_metric A gauge metric representing something.
-# TYPE sample_metric gauge
-sample_metric{name="foo"} 0.123
+# HELP climacell_aq_epa_aqi Air quality index per US EPA standard
+# TYPE climacell_aq_epa_aqi gauge
+climacell_aq_epa_aqi{city="New York, NY",latitude="40.7128",location_name="test",longitude="-74.0059"} 37
+# HELP climacell_weather_dewpoint Temperature of the dew point
+# TYPE climacell_weather_dewpoint gauge
+climacell_weather_dewpoint{city="New York, NY",latitude="40.7128",location_name="test",longitude="-74.0059"} 12.81
+# HELP climacell_weather_feels_like Wind chill and heat window based on season
+# TYPE climacell_weather_feels_like gauge
+climacell_weather_feels_like{city="New York, NY",latitude="40.7128",location_name="test",longitude="-74.0059"} 20.25
